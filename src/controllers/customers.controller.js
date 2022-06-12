@@ -120,3 +120,44 @@ export const getCustomer = async (_req = request, _res = response) => {
     }
 
 };
+
+
+// DELETE CUSTOMER
+export const deleteCustomer = async (_req = request, _res = response) => {
+
+    const { Id } = _req.params;
+
+    const pool = await getConnection();
+
+    try {
+        // Deleting information
+        const resultAudit = await pool.request().input('Id_Customer', Id).query(queries.deleteAuditLogCustomer);
+        const resultIdentification = await pool.request().input('Id_Customer', Id).query(queries.deleteIdentificationCustomer);
+        const resultCustomer = await pool.request().input('Id_Customer', Id).query(queries.deleteCostumer);
+
+
+        // sending information to client
+        _res.json({
+            success: true,
+            statu: 200,
+            result: {
+                resultAudit,
+                resultIdentification,
+                resultCustomer
+            },
+            msg: 'customer has been delete successfully'
+        }).send();
+
+    } catch (_err) {
+        _res.status(500).send({
+            success: false,
+            msg: 'Error deleting customer',
+            error: _err
+        });
+    }
+
+
+
+
+
+};
