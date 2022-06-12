@@ -7,8 +7,11 @@ const app = express();
 // settings
 app.set('port', config.port);
 
-// usage routes
+// middlewares
+app.use(express.json());
+app.use(express.urlencoded({extended:false}));
 
+//routes
 app.use(customersRoutes);
 
 export default app; 
