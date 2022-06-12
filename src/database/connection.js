@@ -15,7 +15,7 @@ export const getConnection = async () => { // connecting database
     try {
         return await sql.connect(dbSettings);
     } catch (_err) {
-        console.error('❌ Bro! There was an error connecting database: ',_err);
+        console.error('❌ Bro! There was an error connecting database: ', _err);
     };
 };
 

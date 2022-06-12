@@ -1,15 +1,12 @@
 import { request, response } from "express";
-import { sql, getConnection } from '../database/connection';
+import { sql, getConnection, queries } from '../database';
 
-
-// GET CUSTOMERS
-export const getCustomers = async(_req = request, _res = response) => {
+// GET ALL CUSTOMERS
+export const getCustomers = async (_req = request, _res = response) => {
     try {
 
-        const query = `SELECT * FROM Customers`;
-
         const pool = await getConnection();
-        const result = await pool.request().query(query);
+        const result = await pool.request().query(queries.getAllCustomers);
 
         _res.json({
             success: true,
@@ -28,7 +25,7 @@ export const getCustomers = async(_req = request, _res = response) => {
 };
 
 // SAVE CUSTOMER
-export const createCustomer = async(_req = request, _res = response) => {
+export const createCustomer = async (_req = request, _res = response) => {
 
     // Object Destructuring
     const { Complete_Name, Contract_Date, Address_Customer } = _req.body;
@@ -54,7 +51,7 @@ export const createCustomer = async(_req = request, _res = response) => {
             .input('Contract_Date', sql.DateTime, Contract_Date)
             .input('Address_Customer', sql.VarChar, Address_Customer)
             .input('Id_Celphone_Plan', sql.VarChar, Id_Celphone_Plan)
-            .query("INSERT INTO Customers (Complete_Name, Contract_Date, Address_Customer,Id_Celphone_Plan) VALUES (@Complete_Name,@Contract_Date,@Address_Customer,@Id_Celphone_Plan)");
+            .query(queries.saveCostumer);
 
 
         _res.json({
@@ -71,4 +68,55 @@ export const createCustomer = async(_req = request, _res = response) => {
             error: _err
         });
     };
+};
+
+// GET CUSTOMER
+export const getCustomer = async (_req = request, _res = response) => {
+
+    try {
+        const { Id } = _req.params;
+
+        const pool = await getConnection();
+        const result = await pool.request().input('Id_Customer', Id).query(queries.getCustomer);
+
+        const customerInfo = result.recordset[0];
+
+        customerInfo.documents = { // adding documents property
+            DUI: '',
+            NIT: '',
+            AFP: '',
+            ISSS: ''
+        };
+
+        result.recordset.forEach((item) => { // building documents property
+
+            const { Number, Identity_Name } = item;
+
+            switch (Identity_Name) {
+                case 'DUI': customerInfo.documents.DUI = Number; break;
+                case 'AFP': customerInfo.documents.AFP = Number; break;
+                case 'NIT': customerInfo.documents.NIT = Number; break;
+                case 'ISSS': customerInfo.documents.ISSS = Number; break;
+            };
+        })
+
+        // removing Number and Identity_Name
+        delete customerInfo.Number;
+        delete customerInfo.Identity_Name;
+
+        // sending information to client
+        _res.json({
+            success: true,
+            statu: 200,
+            data: customerInfo
+        }).send();
+
+    } catch (_err) {
+        _res.status(500).send({
+            success: false,
+            msg: 'Error getting customer information',
+            error: _err
+        });
+    }
+
 };
