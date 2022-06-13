@@ -8,7 +8,7 @@ const router = Router();
 /**
  * Customers
  */
-router.get('/customers', verifyToken, getCustomers); // get All customers
+router.get('/customers', getCustomers); // get All customers
 router.post('/customers', verifyToken, createCustomer); // save customer
 router.get('/customers/:Id', verifyToken, getCustomer); // get Only 1 customer
 router.put('/customers/:Id', verifyToken, updateCustomer); // update customer
