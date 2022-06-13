@@ -16,7 +16,7 @@ export const getCustomers = async (_req = request, _res = response) => {
 
 
     } catch (_err) {
-         _res.json({
+        _res.json({
             success: false,
             msg: 'Error getting all customers information',
             error: _err
@@ -94,12 +94,12 @@ export const createCustomer = async (_req = request, _res = response) => {
 
         _res.json({
             success: true,
-            statu: 200,
+            status: 200,
             msg: 'Customer added successfully',
             result: {
                 resultCustomer,
             }
-        }).send();
+        });
 
     } catch (_err) {
         _res.status(500).send({
@@ -179,19 +179,19 @@ export const deleteCustomer = async (_req = request, _res = response) => {
         // sending information to client
         _res.json({
             success: true,
-            statu: 200,
+            status: 200,
             result: {
                 resultAudit,
                 resultIdentification,
                 resultCustomer
             },
             msg: 'customer has been delete successfully'
-        }).send();
+        });
 
     } catch (_err) {
-        _res.status(500).send({
+        _res.json({
             success: false,
-            msg: 'Error deleting customer',
+            msg: 'Error deleting customer information',
             error: _err
         });
     }
@@ -313,10 +313,10 @@ export const updateCustomer = async (_req = request, _res = response) => {
             success: true,
             status: 200,
             msg: 'Customer updated successfully',
-        }).send();
+        });
 
     } catch (_err) {
-        _res.status(500).send({
+        _res.json({
             success: false,
             msg: 'Error updating customer information',
             error: _err
