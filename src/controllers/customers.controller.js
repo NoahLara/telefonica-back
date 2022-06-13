@@ -91,6 +91,9 @@ export const createCustomer = async (_req = request, _res = response) => {
                 .query(queries.saveDocuments)
         }
 
+        // Saving Audit Log
+
+        saveAudit(2, _req.userID, lastCustomer);
 
         _res.json({
             success: true,
@@ -144,6 +147,10 @@ export const getCustomer = async (_req = request, _res = response) => {
         delete customerInfo.Number;
         delete customerInfo.Identity_Name;
 
+        // Saving Audit Log
+
+        saveAudit(3, _req.userID, Id);
+
         // sending information to client
         _res.json({
             success: true,
@@ -167,6 +174,10 @@ export const deleteCustomer = async (_req = request, _res = response) => {
 
     const { Id } = _req.params;
 
+    // Saving Audit Log
+
+    saveAudit(4, _req.userID, Id);
+
     const pool = await getConnection();
 
     try {
@@ -174,6 +185,7 @@ export const deleteCustomer = async (_req = request, _res = response) => {
         const resultAudit = await pool.request().input('Id_Customer', Id).query(queries.deleteAuditLogCustomer);
         const resultIdentification = await pool.request().input('Id_Customer', Id).query(queries.deleteIdentificationCustomer);
         const resultCustomer = await pool.request().input('Id_Customer', Id).query(queries.deleteCostumer);
+
 
 
         // sending information to client
@@ -308,6 +320,9 @@ export const updateCustomer = async (_req = request, _res = response) => {
             };
         };
 
+        // Saving Audit Log
+
+        saveAudit(5, _req.userID, Id_Customer);
 
         _res.json({
             success: true,
@@ -325,3 +340,38 @@ export const updateCustomer = async (_req = request, _res = response) => {
 
 
 };
+
+
+
+// AUDIT FUNCTION
+
+const saveAudit = async (Action, Id_User, Id_Customer) => {
+
+    const pool = await getConnection();
+
+
+    let actionQuery = '';
+
+    switch (Action) {
+        case 1: actionQuery = 'SELECT ALL ON CUSTOMERS'; break;
+        case 2: actionQuery = 'CREATE ON CUSTOMERS'; break;
+        case 3: actionQuery = 'SELECT ON CUSTOMERS'; break;
+        case 4: actionQuery = 'DELETE ON CUSTOMERS'; break;
+        case 5: actionQuery = 'UPDATE ON CUSTOMERS'; break;
+    }
+
+
+    var today = new Date();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    var Date_Log = date + ' ' + time;
+
+    const result = await pool.request()
+        .input('Action', sql.VarChar, actionQuery)
+        .input('Date_Log', sql.VarChar, Date_Log)
+        .input('Id_User', sql.Int, Id_User)
+        .input('Id_Customer', sql.Int, Id_Customer)
+        .query(queries.saveAuditLog);
+
+
+}
