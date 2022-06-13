@@ -12,11 +12,11 @@ export const getCustomers = async (_req = request, _res = response) => {
             success: true,
             status: 200,
             data: result.recordset
-        }).send();
+        });
 
 
     } catch (_err) {
-        _res.status(500).send({
+         _res.json({
             success: false,
             msg: 'Error getting all customers information',
             error: _err
@@ -121,7 +121,7 @@ export const getCustomer = async (_req = request, _res = response) => {
 
         const customerInfo = result.recordset[0];
 
-        customerInfo.documents = { // adding documents property
+        customerInfo.Documents = { // adding documents property
             DUI: '',
             NIT: '',
             AFP: '',
@@ -133,10 +133,10 @@ export const getCustomer = async (_req = request, _res = response) => {
             const { Number, Identity_Name } = item;
 
             switch (Identity_Name) {
-                case 'DUI': customerInfo.documents.DUI = Number; break;
-                case 'AFP': customerInfo.documents.AFP = Number; break;
-                case 'NIT': customerInfo.documents.NIT = Number; break;
-                case 'ISSS': customerInfo.documents.ISSS = Number; break;
+                case 'DUI': customerInfo.Documents.DUI = Number; break;
+                case 'AFP': customerInfo.Documents.AFP = Number; break;
+                case 'NIT': customerInfo.Documents.NIT = Number; break;
+                case 'ISSS': customerInfo.Documents.ISSS = Number; break;
             };
         })
 
@@ -147,12 +147,12 @@ export const getCustomer = async (_req = request, _res = response) => {
         // sending information to client
         _res.json({
             success: true,
-            statu: 200,
+            status: 200,
             data: customerInfo
-        }).send();
+        });
 
     } catch (_err) {
-        _res.status(500).send({
+        _res.json({
             success: false,
             msg: 'Error getting customer information',
             error: _err
@@ -311,7 +311,7 @@ export const updateCustomer = async (_req = request, _res = response) => {
 
         _res.json({
             success: true,
-            statu: 200,
+            status: 200,
             msg: 'Customer updated successfully',
         }).send();
 
